@@ -79,6 +79,14 @@ app.put('/books/:id', async (req, res)=>{
     }
 })
 
+// delete route
+app.delete('/books/:id', async (req, res)=>{
+    try{
+        res.json(await Books.findByIdAndDelete(req.params.id));
+    }catch{
+        res.status(400).json(error)
+    }
+})
 
 //server listen
 app.listen(PORT, ()=>{
