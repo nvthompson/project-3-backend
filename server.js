@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const cors = require('cors')
 
 //configure server settings
 require('dotenv').config()
@@ -25,11 +26,13 @@ db
 const bookStoreSchema = new mongoose.Schema({
     title: String,
     img: String,
+    author: String,
     descript: String,
     price: Number,
     qty: Number
-}, {timestamps});
+}, {timestamps: true});
 
+const Books = mongoose.model('Books', bookStoreSchema)
 
 //middleware
 app.use(cors());
@@ -40,7 +43,49 @@ app.use(morgan('dev'))
 //Routes
 
 app.get('/', (req, res)=>{
-    res.send('Hello world')
+    res.send('Book Api')
+})
+
+//index route
+app.get('/books', async (req, res)=>{
+    try{
+        res.json(await Books.find({}));
+    } catch (error){
+        res.status(400).json(error)
+    }
+});
+
+//create route
+app.post('/books', async (req, res)=>{
+    try{
+    res.json(await Books.create(req.body));
+    } catch (error){
+        res.status(400).json(error)
+    }
+})
+
+//update route
+app.put('/books/:id', async (req, res)=>{
+    try{
+        res.json(await Books.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new : true
+            }
+        ));
+    } catch {
+        res.status(400).json(error)
+    }
+})
+
+// delete route
+app.delete('/books/:id', async (req, res)=>{
+    try{
+        res.json(await Books.findByIdAndDelete(req.params.id));
+    }catch{
+        res.status(400).json(error)
+    }
 })
 
 //server listen
